@@ -1,0 +1,24 @@
+{
+  "name": "nodeblog",
+  "version": "1.0.0",
+  "description": "基于nodejs的博客开发代码 第一节课",
+  "main": "app.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=dev nodemon ./bin/www.js",
+    "prod": "cross-env NODE_ENV=production nodemon ./bin/www.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhenyulei/nodeBlog.git"
+  },
+  "author": "zhenyulei",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zhenyulei/nodeBlog/issues"
+  },
+  "homepage": "https://github.com/zhenyulei/nodeBlog#readme",
+  "devDependencies": {
+    "cross-env": "^5.2.0",
+    "nodemon": "^1.19.1"
+  }
+}
