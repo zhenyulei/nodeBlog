@@ -5,11 +5,13 @@ const handleUserRouter = (req,res) => {
   //登陆接口 
   if(method==='POST' && req.path === '/api/user/login'){
     const result = loginCheck(req.body);
-    if(result){
-      return new SuccessModel(result);
-    }else{
-      return new ErrorModel('登陆失败');
-    }
+    return result.then((data)=>{
+      if(data.username){
+        return new SuccessModel();
+      }else{
+        return new ErrorModel('登陆失败');
+      }
+    })
   }
 }
 

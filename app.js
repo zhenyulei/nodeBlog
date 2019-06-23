@@ -51,11 +51,13 @@ const serverHandle = (req,res)=>{
       return
     }
     //处理登陆信息
-    const userData = handleUserRouter(req,res);
-    if(userData){
-      res.end(
-        JSON.stringify(userData)
-      )
+    const userResult = handleUserRouter(req,res);
+    if(userResult){
+      userResult.then((userData)=>{
+        res.end(
+          JSON.stringify(userData)
+        )
+      })
       return
     }
     //未命中路由 返回404 并且以纯文本形式返回
