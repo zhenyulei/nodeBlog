@@ -41,11 +41,13 @@ const serverHandle = (req,res)=>{
     req.body = postData;
     //处理blog路由,并且把请求和res的数据传给 handleBlogRouter
     // 这样下面的路由都会获取到req中body的post请求的数据
-    const blogData = handleBlogRouter(req,res);
-    if(blogData){
-      res.end(
-        JSON.stringify(blogData)
-      )
+    const blogResult = handleBlogRouter(req,res);
+    if(blogResult){
+      blogResult.then((blogData)=>{
+        res.end(
+          JSON.stringify(blogData)
+        )
+      })
       return
     }
     //处理登陆信息
