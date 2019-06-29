@@ -36,6 +36,22 @@ const serverHandle = (req,res)=>{
   //解析 query，解析结果以对象的形式放在query中。
   req.query = querystring.parse(url.split('?')[1]);
   
+  // 解析cookie
+  req.cookie = {};
+  const  cookieStr = req.headers.cookie || ''//k1=v1;k2=v2
+  cookieStr.split(';').forEach((item)=>{
+    if(!item){
+      return
+    }
+    const arr = item.split('=');
+    //由于新增多个cookie的时候，会在前面自动加空格，所以需要做处理
+    const key = arr[0].trim();
+    const val = arr[1].trim();
+    req.cookie[key] =val;
+    console.log('req.cookie is',req.cookie);
+    //在浏览器端控制台设置 cookie 然后刷新浏览器即可
+  })
+
   //处理路由前，执行解析
   getPostData(req).then(postData => {
     req.body = postData;
