@@ -3,6 +3,8 @@
 const querystring = require('querystring');
 const handleUserRouter = require('./src/router/user.js'); //路由处理
 const handleBlogRouter = require('./src/router/blog.js');
+const { get, set } = require('./src/db/redis')
+
 //session数据
 const SESSION_DATA = {};
 //获取cookie的过期时间
@@ -59,37 +61,33 @@ const serverHandle = (req,res)=>{
     //console.log('req.cookie is',req.cookie);
     //在浏览器端控制台设置 cookie 然后刷新浏览器即可
   })
-
-  //是否需要设置 cookie,
-  //思路：先从cookie中获取userId，如果没有，则设置 SESSION_DATA 对应key
-  //的value值是随机数，如果有userId，则把 SESSION_DATA[userId]赋值给
-  // session，SESSION_DATA 相当于一个中间变量。
-  // 此外，cookie中没有 userid的时候，就需要在服务器端设置 cookie中的userid
-  // 这样 浏览器端只是通过操作 cookie 中的 userid，来影响 session 中的值
-  let needSetCookie = false; 
   
-   //解析 session
-  let userId = req.cookie.userid;
-  //如果有 userId 则赋值给session 如果没有则赋值空对象
-  //注意 userId 相当于 key:value 中的 key
-  if(userId){ 
-    if(!SESSION_DATA[userId]){
-      SESSION_DATA[userId] = {}; 
-    }
+//解析session 使用 redis
+let needSetCookie = false; 
+let userId = req.cookie.userid;
+if(!userId){//即cookie中没有 userid
+  needSetCookie = true; //返回的res中要设置对应的cookie
+  userId = `${Date.now()}_${Math.random()}`;
+  set(userId,{})// useId在redis中对应的是{name:xx,realname:xxx}
+}
+//获取session
+// 如果没有userId，则设置useId，并在redis中对应的初始化为空对象
+// (如果没有已经给了随机数了) 所以进行到这里肯定会有userId，
+req.sessionId = userId;
+// 从redis 中获取对应的id的val值
+get(req.sessionId).then((sessionData)=>{
+  if(sessionData == null){//即key值没有对应的val值[比如上面没有userId的时候，赋值的id是随机数]
+    //则初始化 redis中的session 值为空对象
+   // set(req.sessionId,{})
+    //userid没有对应的val值，则设置session为空对象
+    res.session={}
   }else{
-    needSetCookie = true;
-    //如果没有 userId （说明是第一次访问，给其赋值一个随机数）
-    userId = `${Date.now()}_${Math.random()}`
-    SESSION_DATA[userId] = {}; 
+    // 例如已经登陆过一次了，再次访问别的接口，sessionData 是username等数据了
+    // 赋值给 session 然后在具体的接口请求中可以通过 session 获取
+    req.session = sessionData;
   }
-  //即session中没有useId的话 就初始化，有的话 就赋值
-  //console.log(SESSION_DATA[userId]);
-  req.session = SESSION_DATA[userId];
-
-
-
-  //处理路由前，执行解析
-  getPostData(req).then(postData => {
+  return getPostData(req);
+}).then(postData => {
     req.body = postData;
     //处理blog路由,并且把请求和res的数据传给 handleBlogRouter
     // 这样下面的路由都会获取到req中body的post请求的数据

@@ -4,18 +4,11 @@
 ## 本节概述 
 ---
 
-- 1. 本节课主要讲解了server端操作 cookie和session
-- 2.  在 app.js 中解析 session,通过获取 userid ，就能拿到对应的用户信息，
-- 3. 思路：
-     首先访问 /api/user/login-test，因为 session 中没有值，所以返回 尚未登陆的信息
-     但是在app.js 中，第一次访问，cookie中是没有 userid 的值的，所以 needSetCookie 为true，
-     且给 req.session 初始化为{},由于 needSetCookie 为true，所以会在返回的res中设置 userid 的cookie
-     第二次访问 /api/user/login-test， cookie中已经有了userid了，needSetCookie 为false，
-     且上次 SESSION_DATA[userId] 中已经初始化为{}了，所以可以直接赋值给 SESSION_DATA[userId]为{}
-     （说明SESSION_DATA[userId]一直是{},如果没有，则赋值给{}，有值的话赋值给也是{}）
-     访问 /api/user/login?username=zhangsan&password=123 接口
-     此时，cookie 中已经有 userid ，且 SESSION_DATA[userId]={},赋值给req.session={}；
-     把数据库中的 username 和 realname 赋值给 session
-     然后在次访问 /api/user/login-test，就能在浏览器中得到 session 值  username 和 realname 了。
-
-
+- 1. 本节课主要讲解了 redis ，首先增加 conf/db.js 中新增 配置;
+- 2. 在db文件夹下新增 redis.js 文件 用来执行连接 redis
+- 3. 修改app.js 文件 增加 redis，思路是 通过登陆接口api中，用 redis 保存id对应的username等信息
+      之后在访问其他接口，先从redis中获取到id对应的username 保存到 session中，其他接口就可以获取到 session的username等信息了
+- 4. 之前 login-test接口都是用来测试有没有登陆，现在把这个判断登陆功能加到其他接口中去。所以要修改 router/blog.js 文件,给对应的接口增加登陆校验，然后需要获取username的也改成从 session获取
+- 5. 在user.js 中将login接口改为 post，username从 req.body 中获取;由于无法再使用 postman 模拟
+保存cookie 所以这里要 使用前端联调了。
+     
