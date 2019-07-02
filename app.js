@@ -8,7 +8,7 @@ const serverHandle = (req,res)=>{
   const url = req.url;
   req.path = url.split('?')[0];
   //解析 query，解析结果以对象的形式放在query中。
-  req.query = querystring.parse(url.split('?')[0]);
+  req.query = querystring.parse(url.split('?')[1]);
   //处理blog路由,并且把请求和res的数据传给 handleBlogRouter
   const blogData = handleBlogRouter(req,res);
   if(blogData){

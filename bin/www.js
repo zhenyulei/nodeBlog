@@ -1,5 +1,5 @@
 const http = require('http');
-const PROT = 8001;
-const serverHandle = require('../app');
+const PROT = 8000;
+const serverHandle = require('../app.js');
 const server = http.createServer(serverHandle);
 server.listen(PROT);
