@@ -1,4 +1,5 @@
 const { exec } = require('../db/mysql');
+const xss = require('xss');
 const getList = (author,keyword)=>{
   // 如果不写 1=1 ，若 author keyword 两个均无值的时候 sql语句就变成了
   // where order by.... 就会报错
@@ -25,6 +26,7 @@ const getDetail = (id)=>{
 const newBlog = (blogData = {})=>{
   //blogData 是一个博客对象，包含了 title content author属性，默认为空对象
   const {title,content,author} = blogData;
+  title = xss(title);
   const createTime = Date.now();
   const sql=`
     insert into blogs (title,content,author,createTime)
